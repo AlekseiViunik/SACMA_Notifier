@@ -61,3 +61,5 @@ if True:
     LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
     LOG_LEVEL = "INFO"
     LOG_ENCODING = "utf-8"
+    LOG_PATH = "logs/app.log"
+    MAX_LOG_LINES = 20000
