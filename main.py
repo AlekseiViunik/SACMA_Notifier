@@ -7,7 +7,12 @@ import consts as c
 
 if __name__ == "__main__":
 
-    def check_log_size():
+    def check_log_size() -> None:
+        """
+        Проверяет размер файла лога. Если он превышает MAX_LOG_LINES
+        (20000 строк по умолчанию), очищает его.
+        """
+
         if os.path.exists(c.LOG_PATH):
             with open(c.LOG_PATH, "r", encoding="utf-8") as f:
                 lines = f.readlines()
