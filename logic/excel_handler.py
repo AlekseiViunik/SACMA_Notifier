@@ -1,3 +1,4 @@
+from typing import cast
 from openpyxl import load_workbook
 from openpyxl.utils import column_index_from_string
 from datetime import datetime, timedelta
@@ -18,7 +19,7 @@ class ExcelHandler:
         словарь с именами и просроченными датами.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.filepath: str = c.EMPTY_STRING
 
     def check_file(
@@ -80,10 +81,10 @@ class ExcelHandler:
             min_col=start_idx,
             max_col=end_idx
         ):
-            row_index = row[0].row
+            row_index = cast(int, row[0].row)
 
             # name - имя раотника, для которого проверяются даты
-            name = ws.cell(row=row_index, column=name_col).value
+            name = str(ws.cell(row=row_index, column=name_col).value)
             if not name:
                 continue
 
@@ -98,7 +99,9 @@ class ExcelHandler:
                         # header - заголовок столбца, например "Scadenza". В
                         # заголовке указан тип документа, для которого
                         # проверяется дата
-                        header = ws.cell(row=c.HEADER_ROW, column=idx).value
+                        header = str(
+                            ws.cell(row=c.HEADER_ROW, column=idx).value
+                        )
                         lg.info(f"===Date expired for: {name}.")
                         lg.info(f"===Expired object is: {header}.")
                         row_result.append(
