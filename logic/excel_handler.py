@@ -8,6 +8,16 @@ from logic.logger import logger as lg
 
 
 class ExcelHandler:
+    """
+    Класс для работы с Excel-файлом.
+
+    Methods
+    -------
+    - check_file(start_col, end_col)
+        Проверяет даты в указанном диапазоне столбцов и возвращает
+        словарь с именами и просроченными датами.
+    """
+
     def __init__(self):
         self.filepath: str = c.EMPTY_STRING
 
@@ -16,9 +26,29 @@ class ExcelHandler:
         start_col: str,
         end_col: str
     ) -> dict[str, list[dict[str, str]]]:
+        """
+        Проверяет даты в указанном диапазоне столбцов и возвращает
+        словарь с именами и просроченными датами.
+
+        Parameters
+        ----------
+        - start_col: str
+            Начальный столбец для проверки (например, "A").
+
+        - end_col: str
+            Конечный столбец для проверки (например, "C").
+
+        Returns
+        -------
+        - result: dict
+            Словарь, где ключами являются имена тех, для кого просрочены
+            документы а значениями - списки словарей с типом документа и
+            просроченными датами.
+        """
 
         lg.info("Start checking the excel file...")
         lg.info(f"Trying to open the file '{self.filepath}'...")
+
         try:
             wb = load_workbook(self.filepath, data_only=True)
             ws = wb[c.EXCEL_SHEET_NAME]
@@ -33,8 +63,10 @@ class ExcelHandler:
         result = {}
 
         lg.info("Set the threshold and today's date.")
+
         today = datetime.today()
         lg.info(f"Today's date: {today}.")
+
         threshold = today + timedelta(days=c.TIME_TRESHOLD)
         lg.info(f"Threshold date: {threshold}.")
 
@@ -49,6 +81,8 @@ class ExcelHandler:
             max_col=end_idx
         ):
             row_index = row[0].row
+
+            # name - имя раотника, для которого проверяются даты
             name = ws.cell(row=row_index, column=name_col).value
             if not name:
                 continue
@@ -61,6 +95,9 @@ class ExcelHandler:
                             "Found a date that is less than or equal to the "
                             "threshold."
                         )
+                        # header - заголовок столбца, например "Scadenza". В
+                        # заголовке указан тип документа, для которого
+                        # проверяется дата
                         header = ws.cell(row=c.HEADER_ROW, column=idx).value
                         lg.info(f"===Date expired for: {name}.")
                         lg.info(f"===Expired object is: {header}.")
@@ -78,4 +115,5 @@ class ExcelHandler:
         lg.info("Finished checking the file.")
         lg.info("Closing the file...")
         wb.close()
+
         return result

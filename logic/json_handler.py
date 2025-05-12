@@ -8,6 +8,33 @@ import consts as c
 
 
 class JsonHandler:
+    """
+    Класс для работы с JSON файлами.
+
+    Attributes
+    ----------
+    - file_path: str
+        Путь к файлу JSON.
+
+    Methods
+    -------
+    - get_all_data()
+        Получает все данные из JSON файла и возвращает их в виде словаря.
+
+    - get_value_by_key(key)
+        Получает данные по ключу из JSON файла и возвращает их.
+
+    - get_values_by_keys(keys)
+        Получает данные по списку ключей из JSON файла и возвращает их в виде
+        словаря.
+
+    - rewrite_file(data)
+        Перезаписывает JSON файл новыми данными.
+
+    - set_file_path(path)
+        Устанавливает абсолютный путь к файлу, если приложение работает как
+        ехе файл.
+    """
 
     def __init__(self, file_path: str) -> None:
         self.file_path: str = c.EMPTY_STRING
@@ -21,8 +48,13 @@ class JsonHandler:
 
         Returns
         -------
-        - _: dict
+        - data | _: dict
             Возвращаемые данные.
+
+        Raises
+        ------
+        - FileNotFoundError
+            Если файл не найден.
         """
 
         if self.file_path:
