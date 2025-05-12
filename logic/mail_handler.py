@@ -25,10 +25,10 @@ class MailHandler:
     def __init__(self) -> None:
         load_dotenv()
 
-        self.smtp_server: str = os.getenv(c.SMTP_SERVER_KEY)
-        self.smtp_port: int = os.getenv(c.SMTP_PORT_KEY)
-        self.sender: str = os.getenv(c.SENDER_ADDRESS_KEY)
-        self.password: str = os.getenv(c.EMAIL_PASSWORD_KEY)
+        self.smtp_server: str = os.getenv(c.SMTP_SERVER_KEY, c.EMPTY_STRING)
+        self.smtp_port: int = int(os.getenv(c.SMTP_PORT_KEY, c.SET_TO_ZERO))
+        self.sender: str = os.getenv(c.SENDER_ADDRESS_KEY, c.EMPTY_STRING)
+        self.password: str = os.getenv(c.EMAIL_PASSWORD_KEY, c.EMPTY_STRING)
 
     def prepare_message(self, data: dict[str, list[dict[str, str]]]) -> str:
         """
@@ -80,7 +80,7 @@ class MailHandler:
 
         if not c.PRODUCTION_MODE:
             lg.info("Production mode is off. Using default recipient.")
-            to = os.getenv(c.RECIPIENT_KEY)
+            to = os.getenv(c.RECIPIENT_KEY, c.EMPTY_STRING)
 
         lg.info("Set up email message.")
         mime_msg = MIMEText(msg)
