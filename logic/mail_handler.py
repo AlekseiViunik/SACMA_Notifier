@@ -6,6 +6,8 @@ from email.mime.text import MIMEText
 
 import consts as c
 
+from logic.logger import logger as lg
+
 
 class MailHandler:
     def __init__(self):
@@ -46,18 +48,27 @@ class MailHandler:
         """
 
         if not c.PRODUCTION_MODE:
+            lg.info("Production mode is off. Using default recipient.")
             to = os.getenv(c.RECIPIENT_KEY)
 
+        lg.info("Set up email message.")
         mime_msg = MIMEText(msg)
         mime_msg[c.SUBJECT] = subject
         mime_msg[c.FROM] = self.sender
         mime_msg[c.TO] = to
 
-        try:
-            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
-                server.starttls()
-                server.login(self.sender, self.password)
-                server.send_message(mime_msg)
+        if not c.SIMULATE_MAIL_SENDING:
+            lg.info(f"Trying to send email to '{to}' from '{self.sender}'.")
+            try:
+                with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+                    server.starttls()
+                    server.login(self.sender, self.password)
+                    server.send_message(mime_msg)
+                    lg.info("Email sent successfully!")
 
-        except Exception as e:
-            print(f"Error sending email: {e}")
+            except Exception as e:
+                lg.error(f"Error sending email: {e}")
+                print(f"Error sending email: {e}")
+        else:
+            lg.info("Simulate mail sending is on.")
+            lg.info("Consider the email sent successfully.")
