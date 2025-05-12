@@ -81,6 +81,8 @@ class ExcelHandler:
             max_col=end_idx
         ):
             row_index = row[0].row
+
+            # name - имя раотника, для которого проверяются даты
             name = ws.cell(row=row_index, column=name_col).value
             if not name:
                 continue
@@ -93,6 +95,9 @@ class ExcelHandler:
                             "Found a date that is less than or equal to the "
                             "threshold."
                         )
+                        # header - заголовок столбца, например "Scadenza". В
+                        # заголовке указан тип документа, для которого
+                        # проверяется дата
                         header = ws.cell(row=c.HEADER_ROW, column=idx).value
                         lg.info(f"===Date expired for: {name}.")
                         lg.info(f"===Expired object is: {header}.")

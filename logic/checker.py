@@ -73,6 +73,9 @@ class Checker:
 
         if result:
             lg.info("There are expired dates!")
+
+            # name - имя ответственного работника
+            # data - Словарь с просрочкой по датам для этого работника
             for name, data in result.items():
                 lg.info(
                     f"+++++++=======Prepare data for {name}.=======+++++++"
