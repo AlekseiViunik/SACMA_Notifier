@@ -10,7 +10,19 @@ from logic.logger import logger as lg
 
 
 class MailHandler:
-    def __init__(self):
+    """
+    Класс для обработки и отправки электронных писем.
+
+    Methods
+    -------
+    - prepare_message(data)
+        Подготавливает сообщение для отправки по электронной почте.
+
+    - send_email(to, subject, msg)
+        Отправляет электронное письмо.
+    """
+
+    def __init__(self) -> None:
         load_dotenv()
 
         self.smtp_server: str = os.getenv(c.SMTP_SERVER_KEY)
@@ -18,7 +30,22 @@ class MailHandler:
         self.sender: str = os.getenv(c.SENDER_ADDRESS_KEY)
         self.password: str = os.getenv(c.EMAIL_PASSWORD_KEY)
 
-    def prepare_message(self, data):
+    def prepare_message(self, data: dict[str, list[dict[str, str]]]) -> str:
+        """
+        Подготавливает сообщение для отправки по электронной почте.
+
+        Parameters
+        ----------
+        - data: dict
+            Словарь с данными о просроченных документах для вставки этих данных
+            в сообщение.
+
+        Returns
+        -------
+        - message: str
+            Подготовленное сообщение для отправки по электронной почте.
+        """
+
         message = (
             "I seguenti documenti sono prossimi alla scadenza o sono già "
             "scaduti:\n"
@@ -31,9 +58,13 @@ class MailHandler:
 
         return message
 
-    def send_email(self, to: str, subject: str, msg: str):
+    def send_email(self, to: str, subject: str, msg: str) -> None:
         """
-        Отправляет электронное письмо.
+        Отправляет электронное письмо. Если включена симуляция, то
+        отправка не происходит, а просто выводится сообщение об успешной
+        отправке в логи. Если выключен продакшн, то используется адрес
+        электронной почты, указанный в переменной окружения вместо адреса
+        получателя.
 
         Parameters
         ----------
@@ -68,7 +99,7 @@ class MailHandler:
 
             except Exception as e:
                 lg.error(f"Error sending email: {e}")
-                print(f"Error sending email: {e}")
+                return
         else:
             lg.info("Simulate mail sending is on.")
             lg.info("Consider the email sent successfully.")
