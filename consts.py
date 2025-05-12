@@ -3,6 +3,7 @@ Here the principal consts are defined.
 """
 
 PRODUCTION_MODE = False
+SIMULATE_MAIL_SENDING = True
 
 
 EXE_FROZEN = 'frozen'
@@ -51,3 +52,14 @@ if True:
     SUBJECT = "Subject"
     FROM = "From"
     TO = "To"
+
+# Logger consts
+if True:
+    LOG_DIR = "logs"
+    LOG_FILE = "app.log"
+    LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+    LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+    LOG_LEVEL = "INFO"
+    LOG_ENCODING = "utf-8"
+    LOG_PATH = "logs/app.log"
+    MAX_LOG_LINES = 20000

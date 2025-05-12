@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 
 import consts as c
 
+from logic.logger import logger as lg
+
 
 class ExcelHandler:
     def __init__(self):
@@ -14,16 +16,33 @@ class ExcelHandler:
         start_col: str,
         end_col: str
     ) -> dict[str, list[dict[str, str]]]:
-        wb = load_workbook(self.filepath, data_only=True)
-        ws = wb[c.EXCEL_SHEET_NAME]
+
+        lg.info("Start checking the excel file...")
+        lg.info(f"Trying to open the file '{self.filepath}'...")
+        try:
+            wb = load_workbook(self.filepath, data_only=True)
+            ws = wb[c.EXCEL_SHEET_NAME]
+            lg.info(f"File '{self.filepath}' opened successfully.")
+        except FileNotFoundError:
+            lg.error(f"File not found: '{self.filepath}'.")
+            return {}
+        except Exception as e:
+            lg.error(f"An error occurred while opening the file: {e}.")
+            return {}
+
         result = {}
+
+        lg.info("Set the threshold and today's date.")
         today = datetime.today()
+        lg.info(f"Today's date: {today}.")
         threshold = today + timedelta(days=c.TIME_TRESHOLD)
+        lg.info(f"Threshold date: {threshold}.")
 
         name_col = c.EXCEL_NAME_COL
         start_idx = column_index_from_string(start_col)
         end_idx = column_index_from_string(end_col)
 
+        lg.info("Start checking the dates in the file.")
         for row in ws.iter_rows(
             min_row=c.EXCEL_START_ROW,
             min_col=start_idx,
@@ -38,13 +57,25 @@ class ExcelHandler:
             for idx, cell in enumerate(row, start=start_idx):
                 if isinstance(cell.value, datetime):
                     if cell.value <= threshold:
+                        lg.info(
+                            "Found a date that is less than or equal to the "
+                            "threshold."
+                        )
                         header = ws.cell(row=c.HEADER_ROW, column=idx).value
+                        lg.info(f"===Date expired for: {name}.")
+                        lg.info(f"===Expired object is: {header}.")
                         row_result.append(
                             {header: cell.value.strftime("%Y-%m-%d")}
+                        )
+                        value = row_result[-1][header]
+                        lg.info(
+                            f"===Expired date is: {value}."
                         )
 
             if row_result:
                 result[name] = row_result
 
+        lg.info("Finished checking the file.")
+        lg.info("Closing the file...")
         wb.close()
         return result
