@@ -6,14 +6,31 @@ import consts as c
 
 
 class Checker:
-    def __init__(self):
+    """
+    Основной класс для проверки файла Excel на наличие просроченных дат.
+
+    Methods
+    -------
+    - check()
+        Основной метод для проверки файла Excel на наличие просроченных дат.
+    """
+
+    def __init__(self) -> None:
         self.json: JsonHandler = JsonHandler(c.SETTINGS_JSON_ABS)
         self.excel: ExcelHandler = ExcelHandler()
         self.excel_filepath: str = c.EMPTY_STRING
 
-    def check(self):
+    def check(self) -> None:
+        """
+        Основной метод для проверки файла Excel на наличие просроченных дат.
+        Запускет проверку экселя через метод check_file класса ExcelHandler.
+        Если в файле найдены просроченные даты, отправляет уведомление
+        ответственным работникам с помощью класса MailHandler.
+        """
+
         lg.info("Start checking...")
         lg.info("Get excel file path from settings json file.")
+
         try:
             self.excel_filepath = self.json.get_value_by_key(
                 c.EXCEL_FILEPATH_KEY
@@ -77,4 +94,4 @@ class Checker:
                 )
         else:
             lg.info("No expired dates found.")
-            print("No results found.")
+            return
