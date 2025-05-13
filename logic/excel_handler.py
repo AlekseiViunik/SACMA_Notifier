@@ -95,17 +95,22 @@ class ExcelHandler:
 
                 date_obj: datetime | None = None
                 if isinstance(value, datetime):
+                    lg.info("Found a date object.")
                     date_obj = value
                 elif isinstance(value, str):
+                    lg.info("Found a string. Trying to parse it as a date.")
                     try:
                         date_obj = parser.parse(value, dayfirst=True)
-                    except (ValueError, TypeError):
+                        lg.info("Success!")
+                    except (ValueError, TypeError) as e:
+                        lg.info(
+                            f"Failed to parse date from string '{value}': {e}"
+                        )
                         continue  # строка не распарсилась — игнорим
 
                 if date_obj and date_obj <= threshold:
                     lg.info(
-                        "Found a date that is less than or equal to the "
-                        "threshold."
+                        "The date is less than or equal to the threshold."
                     )
                     # header - заголовок столбца, например "Scadenza". В
                     # заголовке указан тип документа, для которого
