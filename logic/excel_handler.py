@@ -2,6 +2,7 @@ from typing import cast
 from openpyxl import load_workbook
 from openpyxl.utils import column_index_from_string
 from datetime import datetime, timedelta
+from dateutil import parser
 
 import consts as c
 
@@ -90,27 +91,37 @@ class ExcelHandler:
 
             row_result = []
             for idx, cell in enumerate(row, start=start_idx):
-                if isinstance(cell.value, datetime):
-                    if cell.value <= threshold:
-                        lg.info(
-                            "Found a date that is less than or equal to the "
-                            "threshold."
-                        )
-                        # header - заголовок столбца, например "Scadenza". В
-                        # заголовке указан тип документа, для которого
-                        # проверяется дата
-                        header = str(
-                            ws.cell(row=c.HEADER_ROW, column=idx).value
-                        )
-                        lg.info(f"===Date expired for: {name}.")
-                        lg.info(f"===Expired object is: {header}.")
-                        row_result.append(
-                            {header: cell.value.strftime("%Y-%m-%d")}
-                        )
-                        value = row_result[-1][header]
-                        lg.info(
-                            f"===Expired date is: {value}."
-                        )
+                value = cell.value
+
+                date_obj: datetime | None = None
+                if isinstance(value, datetime):
+                    date_obj = value
+                elif isinstance(value, str):
+                    try:
+                        date_obj = parser.parse(value, dayfirst=True)
+                    except (ValueError, TypeError):
+                        continue  # строка не распарсилась — игнорим
+
+                if date_obj and date_obj <= threshold:
+                    lg.info(
+                        "Found a date that is less than or equal to the "
+                        "threshold."
+                    )
+                    # header - заголовок столбца, например "Scadenza". В
+                    # заголовке указан тип документа, для которого
+                    # проверяется дата
+                    header = str(
+                        ws.cell(row=c.HEADER_ROW, column=idx).value
+                    )
+                    lg.info(f"===Date expired for: {name}.")
+                    lg.info(f"===Expired object is: {header}.")
+                    row_result.append(
+                        {header: date_obj.strftime("%Y-%m-%d")}
+                    )
+                    value = row_result[-1][header]
+                    lg.info(
+                        f"===Expired date is: {value}."
+                    )
 
             if row_result:
                 result[name] = row_result
